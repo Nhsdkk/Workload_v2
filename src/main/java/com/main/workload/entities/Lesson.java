@@ -1,5 +1,7 @@
 package com.main.workload.entities;
 
+import com.main.workload.dtos.CreateLessonDTO;
+import com.main.workload.dtos.UpdateLessonDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,5 +37,21 @@ public class Lesson {
     public Lesson(String name, Integer semester) {
         this.name = name;
         this.semester = semester;
+    }
+
+    public Lesson(CreateLessonDTO lessonDto) {
+        this(lessonDto.getName(), lessonDto.getSemester());
+    }
+
+    public void Update(UpdateLessonDTO updateLessonDTO) {
+        semester = (updateLessonDTO.getSemester() != null) ? updateLessonDTO.getSemester() : semester;
+        name = (updateLessonDTO.getName() != null) ? updateLessonDTO.getName() : name;
+    }
+
+    @PreRemove
+    private void removeLinks() {
+        for (var employee : qualifiedEmployees) {
+            employee.getAvailableLessons().remove(this);
+        }
     }
 }

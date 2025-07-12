@@ -1,8 +1,6 @@
 package com.main.workload.services;
 
-import com.main.workload.dtos.EmployeePositionDTO;
-import com.main.workload.dtos.EmployeePositionDetailDTO;
-import com.main.workload.dtos.LessonDTO;
+import com.main.workload.dtos.*;
 import com.main.workload.entities.Employee;
 import com.main.workload.entities.EmployeePosition;
 import com.main.workload.entities.Lesson;
@@ -12,6 +10,7 @@ import com.main.workload.repositories.LessonRepository;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.lang.module.ResolutionException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,50 +42,18 @@ public class EmployeeService {
 
     public List<EmployeePositionDTO> getAllEmployeePositions() {
         List<EmployeePosition> positions = employeePositionRepository.findAll();
-        return positions.stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
-
-    private EmployeePositionDTO mapToDTO(EmployeePosition position) {
-        EmployeePositionDTO dto = new EmployeePositionDTO();
-        dto.setId(position.getId());
-        dto.setEmployeeName(position.getEmployee().getName());
-        dto.setPost(position.getPost().getDisplayName());
-        dto.setRate(position.getRate());
-        dto.setStructuralDivision(position.getStructuralDivision().getDisplayName());
-        dto.setActive(position.getActive());
-        return dto;
+        return positions.stream().map(EmployeePositionDTO::new).collect(Collectors.toList());
     }
 
     public EmployeePositionDetailDTO getEmployeePositionDetailById(Long id) {
         EmployeePosition position = employeePositionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Position not found"));
         Employee employee = position.getEmployee();
-        List<Lesson> lessons = employee.getAvailableLessons();
 
-        EmployeePositionDetailDTO dto = new EmployeePositionDetailDTO();
-        dto.setId(position.getId());
-        dto.setEmployeeName(employee.getName());
-        dto.setPost(position.getPost().getDisplayName());
-        dto.setRate(position.getRate());
-        dto.setStructuralDivision(position.getStructuralDivision().getDisplayName());
-        dto.setActive(position.getActive());
-        dto.setCompetencies(lessons.stream().map(this::mapLessonToDTO).collect(Collectors.toList()));
-        return dto;
+        return new EmployeePositionDetailDTO(employee, position);
     }
 
-    private LessonDTO mapLessonToDTO(Lesson lesson) {
-        LessonDTO dto = new LessonDTO();
-        dto.setId(lesson.getId());
-        dto.setName(lesson.getName());
-        return dto;
-    }
-
-    public List<LessonDTO> getAllLessons() {
-        List<Lesson> lessons = lessonRepository.findAll();
-        return lessons.stream().map(this::mapLessonToDTO).collect(Collectors.toList());
-    }
-
-    public void addLessonToEmployee(Long positionId, Long lessonId) {
+    public EmployeePositionDetailDTO addLessonToEmployee(Long positionId, Long lessonId) {
         EmployeePosition position = employeePositionRepository.findById(positionId)
                 .orElseThrow(() -> new RuntimeException("Position not found"));
         Employee employee = position.getEmployee();
@@ -96,6 +63,8 @@ public class EmployeeService {
             employee.addLesson(lesson);
             employeeRepository.save(employee);
         }
+
+        return new EmployeePositionDetailDTO(employee, position);
     }
 
     public void removeLessonFromEmployee(Long positionId, Long lessonId) {
@@ -108,5 +77,37 @@ public class EmployeeService {
             employee.getAvailableLessons().remove(lesson);
             employeeRepository.save(employee);
         }
+    }
+
+    public EmployeeWithPositionsDTO createEmployee(CreateEmployeeDTO employeeDTO) {
+        var employee = new Employee(employeeDTO);
+        employeeRepository.save(employee);
+        return new EmployeeWithPositionsDTO(employee);
+    }
+
+    public void deleteEmployee(Long employeeId) {
+        employeeRepository.deleteById(employeeId);
+    }
+
+    public EmployeePositionDetailDTO updateEmployeePosition(UpdateEmployeePositionDTO updateEmployeePositionDTO) {
+        var position = employeePositionRepository.findById(updateEmployeePositionDTO.getId());
+        if (position.isEmpty()) {
+            throw new ResolutionException("Employee not found");
+        }
+
+        position.get().Update(updateEmployeePositionDTO);
+        employeePositionRepository.save(position.get());
+        return new EmployeePositionDetailDTO(position.get().getEmployee(), position.get());
+    }
+
+    public EmployeeWithPositionsDTO updateEmployee(UpdateEmployeeDTO updateEmployeeDTO) {
+        var result = employeeRepository.findById(updateEmployeeDTO.getId());
+        if (result.isEmpty()) {
+            throw new ResolutionException("Employee not found");
+        }
+
+        result.get().Update(updateEmployeeDTO);
+        employeeRepository.save(result.get());
+        return new EmployeeWithPositionsDTO(result.get());
     }
 }

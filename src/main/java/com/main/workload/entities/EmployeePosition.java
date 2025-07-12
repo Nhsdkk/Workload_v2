@@ -1,5 +1,7 @@
 package com.main.workload.entities;
 
+import com.main.workload.dtos.CreateEmployeeDTO;
+import com.main.workload.dtos.UpdateEmployeePositionDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +37,15 @@ public class EmployeePosition {
         this.post = post;
         this.structuralDivision = structuralDivision;
         this.active = true;
+    }
+
+    public EmployeePosition(CreateEmployeeDTO.CreatePositionDTO dto) {
+        this(
+                dto.getRate(),
+                EmployeePosition.Post.fromDisplayName(dto.getPost()),
+                EmployeePosition.StructuralDivision.fromDisplayName(dto.getStructuralDivision())
+        );
+        setActive(dto.getActive());
     }
 
     @Getter
@@ -91,6 +102,13 @@ public class EmployeePosition {
             }
             throw new IllegalArgumentException("No Post found for display name: " + displayName);
         }
+    }
+
+    public void Update(UpdateEmployeePositionDTO updateEmployeePositionDTO) {
+        setRate(updateEmployeePositionDTO.getRate() == null ? rate: updateEmployeePositionDTO.getRate());
+        setPost(updateEmployeePositionDTO.getPost() == null ? post: Post.fromDisplayName(updateEmployeePositionDTO.getPost()));
+        setActive(updateEmployeePositionDTO.getActive() == null ? active: updateEmployeePositionDTO.getActive());
+        setStructuralDivision(updateEmployeePositionDTO.getStructuralDivision() == null ? structuralDivision : StructuralDivision.fromDisplayName(updateEmployeePositionDTO.getStructuralDivision()));
     }
 }
 

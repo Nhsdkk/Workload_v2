@@ -1,5 +1,6 @@
 package com.main.workload.dtos;
 
+import com.main.workload.entities.EmployeePosition;
 import lombok.Data;
 
 @Data
@@ -10,4 +11,13 @@ public class EmployeePositionDTO {
     private Double rate;
     private String structuralDivision;
     private Boolean active;
+
+    public EmployeePositionDTO(EmployeePosition position) {
+        id = position.getId();
+        employeeName = position.getEmployee().getName();
+        post = position.getPost().getDisplayName();
+        rate = position.getRate();
+        structuralDivision = position.getStructuralDivision().getDisplayName();
+        active = position.getActive();
+    }
 }

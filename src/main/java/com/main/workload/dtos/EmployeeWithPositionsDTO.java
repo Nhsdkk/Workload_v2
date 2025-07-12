@@ -20,6 +20,10 @@ public class EmployeeWithPositionsDTO {
         this.positions = positions.stream().map(PositionDTO::new).toList();
     }
 
+    public EmployeeWithPositionsDTO(Employee employee) {
+        this(employee, employee.getPositions());
+    }
+
     @Data
     public static class PositionDTO {
         private Long id;

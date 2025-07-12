@@ -1,10 +1,11 @@
 package com.main.workload.dtos;
 
+import com.main.workload.entities.Employee;
+import com.main.workload.entities.EmployeePosition;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class EmployeePositionDetailDTO {
@@ -15,4 +16,14 @@ public class EmployeePositionDetailDTO {
     private String structuralDivision;
     private Boolean active;
     private List<LessonDTO> competencies;
+
+    public EmployeePositionDetailDTO(Employee employee, EmployeePosition position) {
+        setId(position.getId());
+        setEmployeeName(position.getEmployee().getName());
+        setPost(position.getPost().toString());
+        setRate(position.getRate());
+        setStructuralDivision(position.getStructuralDivision().toString());
+        setActive(position.getActive());
+        setCompetencies(employee.getAvailableLessons().stream().map(LessonDTO::new).collect(Collectors.toList()));
+    }
 }

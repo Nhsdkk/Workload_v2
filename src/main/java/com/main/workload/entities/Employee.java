@@ -1,5 +1,7 @@
 package com.main.workload.entities;
 
+import com.main.workload.dtos.CreateEmployeeDTO;
+import com.main.workload.dtos.UpdateEmployeeDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,9 +47,27 @@ public class Employee {
         this.positions = new ArrayList<>();
     }
 
+    public Employee(CreateEmployeeDTO dto) {
+        this(dto.getName(), dto.getTypeOfEmployment());
+        var position = new EmployeePosition(dto.getPosition());
+        addPosition(position);
+    }
+
     public void addPosition(@NonNull EmployeePosition position) {
         position.setEmployee(this);
         positions.add(position);
+    }
+
+    @PreRemove
+    private void removeLessonLinks(){
+        for (var lesson : availableLessons){
+            lesson.getQualifiedEmployees().remove(this);
+        }
+    }
+
+    public void Update(UpdateEmployeeDTO updateEmployeeDTO) {
+        setName(updateEmployeeDTO.getName() == null ? name : updateEmployeeDTO.getName());
+        setTypeOfEmployment(updateEmployeeDTO.getTypeOfEmployment() == null ? typeOfEmployment : updateEmployeeDTO.getTypeOfEmployment());
     }
 }
 
