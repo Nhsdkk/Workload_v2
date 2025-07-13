@@ -25,7 +25,7 @@ public class EmployeeController {
         employeeService.deleteEmployee(id);
     }
 
-    @PutMapping("/employee")
+    @PutMapping
     public EmployeeWithPositionsDTO updateEmployee(@RequestBody UpdateEmployeeDTO dto) {
         return employeeService.updateEmployee(dto);
     }
