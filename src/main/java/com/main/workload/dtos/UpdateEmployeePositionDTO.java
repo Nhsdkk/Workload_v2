@@ -1,5 +1,6 @@
 package com.main.workload.dtos;
 
+import com.main.workload.entities.EmployeePosition;
 import jakarta.annotation.Nullable;
 import lombok.Data;
 
@@ -9,9 +10,9 @@ public class UpdateEmployeePositionDTO {
     @Nullable
     private Double rate;
     @Nullable
-    private String post;
+    private EmployeePosition.Post post;
     @Nullable
-    private String structuralDivision;
+    private EmployeePosition.StructuralDivision structuralDivision;
     @Nullable
     private Boolean active;
 

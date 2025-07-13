@@ -42,8 +42,8 @@ public class EmployeePosition {
     public EmployeePosition(CreateEmployeeDTO.CreatePositionDTO dto) {
         this(
                 dto.getRate(),
-                EmployeePosition.Post.fromDisplayName(dto.getPost()),
-                EmployeePosition.StructuralDivision.fromDisplayName(dto.getStructuralDivision())
+                dto.getPost(),
+                dto.getStructuralDivision()
         );
         setActive(dto.getActive());
     }
@@ -106,9 +106,9 @@ public class EmployeePosition {
 
     public void Update(UpdateEmployeePositionDTO updateEmployeePositionDTO) {
         setRate(updateEmployeePositionDTO.getRate() == null ? rate: updateEmployeePositionDTO.getRate());
-        setPost(updateEmployeePositionDTO.getPost() == null ? post: Post.fromDisplayName(updateEmployeePositionDTO.getPost()));
+        setPost(updateEmployeePositionDTO.getPost() == null ? post: updateEmployeePositionDTO.getPost());
         setActive(updateEmployeePositionDTO.getActive() == null ? active: updateEmployeePositionDTO.getActive());
-        setStructuralDivision(updateEmployeePositionDTO.getStructuralDivision() == null ? structuralDivision : StructuralDivision.fromDisplayName(updateEmployeePositionDTO.getStructuralDivision()));
+        setStructuralDivision(updateEmployeePositionDTO.getStructuralDivision() == null ? structuralDivision : updateEmployeePositionDTO.getStructuralDivision());
     }
 }
 
