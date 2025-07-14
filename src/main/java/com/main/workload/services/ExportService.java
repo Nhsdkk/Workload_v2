@@ -1,11 +1,10 @@
 package com.main.workload.services;
 
+import com.main.workload.dtos.WorkloadExportDTO;
 import com.main.workload.entities.StudentsGroup;
 import com.main.workload.entities.Workload;
 import com.main.workload.entities.WorkloadContainer;
 import com.main.workload.repositories.WorkloadContainerRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -13,18 +12,23 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class ExcelExportService {
+public class ExportService {
 
     private final WorkloadContainerRepository workloadContainerRepository;
 
-    public ExcelExportService(WorkloadContainerRepository workloadContainerRepository) {
+    public ExportService(WorkloadContainerRepository workloadContainerRepository) {
         this.workloadContainerRepository = workloadContainerRepository;
     }
 
+    public List<WorkloadExportDTO> getWorkloads() {
+        var containers = workloadContainerRepository.findAllWithAssociations();
+        return prepareExportData(containers);
+    }
 
     public byte[] export() throws IOException {
         var containers = workloadContainerRepository.findAllWithAssociations();
@@ -99,7 +103,7 @@ public class ExcelExportService {
         // Список групп
         String groups = wc.getWorkloads().stream()
                 .map(Workload::getGroup)
-                .filter(g -> g != null)
+                .filter(Objects::nonNull)
                 .map(StudentsGroup::getName)
                 .distinct()
                 .collect(Collectors.joining(", "));
@@ -130,16 +134,5 @@ public class ExcelExportService {
         style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         return style;
-    }
-
-    @Data
-    @AllArgsConstructor
-    static
-    class WorkloadExportDTO {
-        private String lessonName;
-        private String workloadTypes;
-        private Integer workloadHours;
-        private String teacherName;
-        private String groups;
     }
 }
