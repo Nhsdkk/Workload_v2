@@ -27,14 +27,9 @@ public class EmployeePositionController {
         return employeeService.getEmployeePositionDetailById(id);
     }
 
-    @PostMapping("/{id}/add-lesson")
-    public EmployeePositionDetailDTO addLessonToEmployee(@PathVariable Long id, @RequestParam Long lessonId) {
-        return employeeService.addLessonToEmployee(id, lessonId);
-    }
-
-    @DeleteMapping("/{id}/remove-lesson/{lessonId}")
-    public void removeLessonFromEmployee(@PathVariable Long id, @PathVariable Long lessonId) {
-        employeeService.removeLessonFromEmployee(id, lessonId);
+    @PostMapping("/{id}/modify-lessons")
+    public EmployeePositionDetailDTO modifyEmployeeLessons(@PathVariable Long id, @RequestParam List<Long> lessonIds) {
+        return employeeService.modifyEmployeeLessons(id, lessonIds);
     }
 
     @PutMapping

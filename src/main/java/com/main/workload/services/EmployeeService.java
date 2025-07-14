@@ -3,7 +3,7 @@ package com.main.workload.services;
 import com.main.workload.dtos.*;
 import com.main.workload.entities.Employee;
 import com.main.workload.entities.EmployeePosition;
-import com.main.workload.entities.Lesson;
+import com.main.workload.exceptions.ResourceNotFoundException;
 import com.main.workload.repositories.EmployeePositionRepository;
 import com.main.workload.repositories.EmployeeRepository;
 import com.main.workload.repositories.LessonRepository;
@@ -53,30 +53,17 @@ public class EmployeeService {
         return new EmployeePositionDetailDTO(employee, position);
     }
 
-    public EmployeePositionDetailDTO addLessonToEmployee(Long positionId, Long lessonId) {
+    public EmployeePositionDetailDTO modifyEmployeeLessons(Long positionId, List<Long> lessonIds) {
         EmployeePosition position = employeePositionRepository.findById(positionId)
                 .orElseThrow(() -> new RuntimeException("Position not found"));
         Employee employee = position.getEmployee();
-        Lesson lesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new RuntimeException("Lesson not found"));
-        if (!employee.getAvailableLessons().contains(lesson)) {
-            employee.addLesson(lesson);
-            employeeRepository.save(employee);
+        var lessons = lessonRepository.findAllById(lessonIds);
+        if (lessons.size() != lessonIds.size()) {
+            throw new ResourceNotFoundException("Some lessons not found");
         }
+        employee.setAvailableLessons(lessons);
 
         return new EmployeePositionDetailDTO(employee, position);
-    }
-
-    public void removeLessonFromEmployee(Long positionId, Long lessonId) {
-        EmployeePosition position = employeePositionRepository.findById(positionId)
-                .orElseThrow(() -> new RuntimeException("Position not found"));
-        Employee employee = position.getEmployee();
-        Lesson lesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new RuntimeException("Lesson not found"));
-        if (employee.getAvailableLessons().contains(lesson)) {
-            employee.getAvailableLessons().remove(lesson);
-            employeeRepository.save(employee);
-        }
     }
 
     public EmployeeWithPositionsDTO createEmployee(CreateEmployeeDTO employeeDTO) {
