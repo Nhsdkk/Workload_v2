@@ -1,6 +1,7 @@
 package com.main.workload.services;
 
 import com.main.workload.dtos.WorkloadExportDTO;
+import com.main.workload.dtos.WorkloadExportExcelDTO;
 import com.main.workload.entities.StudentsGroup;
 import com.main.workload.entities.Workload;
 import com.main.workload.entities.WorkloadContainer;
@@ -27,7 +28,10 @@ public class ExportService {
 
     public List<WorkloadExportDTO> getWorkloads() {
         var containers = workloadContainerRepository.findAllWithAssociations();
-        return prepareExportData(containers);
+        return containers
+                .stream()
+                .map(WorkloadExportDTO::new)
+                .collect(Collectors.toList());
     }
 
     public byte[] export() throws IOException {
@@ -60,7 +64,7 @@ public class ExportService {
 
             // Заполнение данными
             int rowNum = 1;
-            for (WorkloadExportDTO item : data) {
+            for (WorkloadExportExcelDTO item : data) {
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(item.getLessonName());
                 row.createCell(1).setCellValue(item.getWorkloadTypes());
@@ -79,13 +83,13 @@ public class ExportService {
         }
     }
 
-    private List<WorkloadExportDTO> prepareExportData(List<WorkloadContainer> containers) {
+    private List<WorkloadExportExcelDTO> prepareExportData(List<WorkloadContainer> containers) {
         return containers.stream()
                 .map(this::convertToExportDTO)
                 .collect(Collectors.toList());
     }
 
-    private WorkloadExportDTO convertToExportDTO(WorkloadContainer wc) {
+    private WorkloadExportExcelDTO convertToExportDTO(WorkloadContainer wc) {
         // Наименование дисциплины
         String lessonName = wc.getLesson() != null ? wc.getLesson().getName() : "N/A";
 
@@ -108,7 +112,7 @@ public class ExportService {
                 .distinct()
                 .collect(Collectors.joining(", "));
 
-        return new WorkloadExportDTO(
+        return new WorkloadExportExcelDTO(
                 lessonName,
                 String.join(", ", workloadTypes),
                 hours,
