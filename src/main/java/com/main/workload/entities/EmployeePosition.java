@@ -5,6 +5,8 @@ import com.main.workload.dtos.UpdateEmployeePositionDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "employee_position")
 @Data
@@ -24,12 +26,27 @@ public class EmployeePosition {
 
     private Boolean active;
 
+    @OneToMany(mappedBy = "position", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkloadContainer> workloadContainers;
+
     @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
     public Double getFullWorkload() {
         return rate * 830 + 300;
+    }
+
+    public Integer getTotalWorkload() {
+        return workloadContainers
+                .stream()
+                .map(WorkloadContainer::getWorkloadHours)
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
+
+    public Boolean isOverloaded() {
+        return getTotalWorkload() > getFullWorkload();
     }
 
     public EmployeePosition(Double rate, Post post, StructuralDivision structuralDivision) {
