@@ -1,6 +1,6 @@
 package com.main.workload.entities;
 
-import com.main.workload.dtos.CreateEmployeeDTO;
+import com.main.workload.dtos.CreateEmployeePositionDTO;
 import com.main.workload.dtos.UpdateEmployeePositionDTO;
 import jakarta.persistence.*;
 import lombok.*;
@@ -56,7 +56,7 @@ public class EmployeePosition {
         this.active = true;
     }
 
-    public EmployeePosition(CreateEmployeeDTO.CreatePositionDTO dto) {
+    public EmployeePosition(CreateEmployeePositionDTO dto) {
         this(
                 dto.getRate(),
                 Post.fromDisplayName(dto.getPost()),

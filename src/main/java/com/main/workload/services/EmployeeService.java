@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.module.ResolutionException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -102,5 +103,47 @@ public class EmployeeService {
         result.get().Update(updateEmployeeDTO);
         employeeRepository.save(result.get());
         return new EmployeeWithPositionsDTO(result.get());
+    }
+
+    public EmployeeWithPositionsDTO createPosition(Long employeeId, CreateEmployeePositionDTO employeePositionDTO) {
+        var employee = employeeRepository.findById(employeeId);
+        if (employee.isEmpty()) {
+            throw new ResourceNotFoundException("Employee not found");
+        }
+        var position = new EmployeePosition(employeePositionDTO);
+        employee.get().addPosition(position);
+        employeeRepository.save(employee.get());
+        return new EmployeeWithPositionsDTO(employee.get());
+    }
+
+    public List<EmployeeDTO> getEmployees() {
+        return employeeRepository
+                .findAll()
+                .stream()
+                .map(EmployeeDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public EmployeeWithPositionsDTO getEmployee(Long employeeId) {
+        var employee = employeeRepository.findById(employeeId);
+        if (employee.isEmpty()) {
+            throw new ResourceNotFoundException("Employee not found");
+        }
+        return new EmployeeWithPositionsDTO(employee.get());
+    }
+
+    public EmployeeWithPositionsDTO deletePosition(Long employeeId, Long positionId) {
+        var position = employeePositionRepository.findById(employeeId);
+        if (position.isEmpty()) {
+            throw new ResourceNotFoundException("Employee position not found");
+        }
+
+        if (!Objects.equals(position.get().getEmployee().getId(), employeeId)) {
+            throw new ResourceNotFoundException("Employee not found");
+        }
+
+        var employee = position.get().getEmployee();
+        employeePositionRepository.deleteById(positionId);
+        return new EmployeeWithPositionsDTO(employee);
     }
 }

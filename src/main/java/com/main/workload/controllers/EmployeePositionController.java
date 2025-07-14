@@ -35,4 +35,16 @@ public class EmployeePositionController {
     @PutMapping
     public EmployeePositionDetailDTO updateEmployeePosition(@RequestBody UpdateEmployeePositionDTO dto) {
         return employeeService.updateEmployeePosition(dto);
-    }}
+    }
+
+    @PostMapping("/{id}")
+    public EmployeeWithPositionsDTO addEmployeePosition(@PathVariable Long id, @RequestBody CreateEmployeePositionDTO dto) {
+        return employeeService.createPosition(id, dto);
+    }
+
+    @DeleteMapping("/{employeeId}/{positionId}")
+    public EmployeeWithPositionsDTO deleteEmployeePosition(@PathVariable Long employeeId, @PathVariable Long positionId) {
+        return employeeService.deletePosition(employeeId, positionId);
+    }
+}
+
