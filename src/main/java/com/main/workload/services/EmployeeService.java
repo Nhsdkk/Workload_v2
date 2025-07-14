@@ -62,6 +62,7 @@ public class EmployeeService {
             throw new ResourceNotFoundException("Some lessons not found");
         }
         employee.setAvailableLessons(lessons);
+        employeeRepository.save(employee);
 
         return new EmployeePositionDetailDTO(employee, position);
     }
