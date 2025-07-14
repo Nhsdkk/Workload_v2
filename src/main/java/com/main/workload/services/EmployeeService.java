@@ -69,6 +69,11 @@ public class EmployeeService {
 
     public EmployeeWithPositionsDTO createEmployee(CreateEmployeeDTO employeeDTO) {
         var employee = new Employee(employeeDTO);
+        var lessons = lessonRepository.findAllById(employeeDTO.getLessonIds());
+        if (lessons.size() != employeeDTO.getLessonIds().size()) {
+            throw new ResourceNotFoundException("Some lessons not found");
+        }
+        employee.setAvailableLessons(lessons);
         employeeRepository.save(employee);
         return new EmployeeWithPositionsDTO(employee);
     }
