@@ -1,6 +1,5 @@
 package com.main.workload.dtos;
 
-import com.main.workload.entities.EmployeePosition;
 import lombok.Data;
 
 import java.util.List;
@@ -14,8 +13,8 @@ public class CreateEmployeeDTO {
 
     @Data
     public static class CreatePositionDTO {
-        private EmployeePosition.Post post;
-        private EmployeePosition.StructuralDivision structuralDivision;
+        private String post;
+        private String structuralDivision;
         private Double rate;
         private Boolean active;
     }
