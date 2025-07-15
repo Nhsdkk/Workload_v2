@@ -20,9 +20,9 @@ public class EmployeePositionDetailDTO {
     public EmployeePositionDetailDTO(Employee employee, EmployeePosition position) {
         setId(position.getId());
         setEmployeeName(position.getEmployee().getName());
-        setPost(position.getPost().toString());
+        setPost(position.getPost().getDisplayName());
         setRate(position.getRate());
-        setStructuralDivision(position.getStructuralDivision().toString());
+        setStructuralDivision(position.getStructuralDivision().getDisplayName());
         setActive(position.getActive());
         setCompetencies(employee.getAvailableLessons().stream().map(LessonDTO::new).collect(Collectors.toList()));
     }
