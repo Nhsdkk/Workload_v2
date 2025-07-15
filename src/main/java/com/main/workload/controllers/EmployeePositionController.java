@@ -27,11 +27,6 @@ public class EmployeePositionController {
         return employeeService.getEmployeePositionDetailById(id);
     }
 
-    @PostMapping("/{id}/modify-lessons")
-    public EmployeePositionDetailDTO modifyEmployeeLessons(@PathVariable Long id, @RequestParam List<Long> lessonIds) {
-        return employeeService.modifyEmployeeLessons(id, lessonIds);
-    }
-
     @PutMapping
     public EmployeePositionDetailDTO updateEmployeePosition(@RequestBody UpdateEmployeePositionDTO dto) {
         return employeeService.updateEmployeePosition(dto);
