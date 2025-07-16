@@ -19,11 +19,11 @@ public class EmployeePositionAnalyticsDTO {
         setId(position.getId());
         setName(position.getEmployee().getName());
         setTypeOfEmployment(position.getEmployee().getTypeOfEmployment());
-        setPost(position.getPost().toString());
+        setPost(position.getPost().getDisplayName());
         setRate(position.getRate());
         setActive(position.getActive());
         setOverloaded(position.isOverloaded());
         setTotalHours(position.getTotalWorkload());
-        setStructuralDivision(position.getStructuralDivision().toString());
+        setStructuralDivision(position.getStructuralDivision().getDisplayName());
     }
 }
