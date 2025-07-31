@@ -3,7 +3,6 @@ package com.main.workload.repositories;
 import com.main.workload.entities.Lesson;
 import com.main.workload.entities.StudentsGroup;
 import com.main.workload.entities.Workload;
-import com.main.workload.entities.WorkloadContainer;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -40,5 +39,7 @@ public interface WorkloadRepository extends JpaRepository<Workload, Long> {
 
     @Query("SELECT w FROM Workload w WHERE w.group.name LIKE CONCAT('М', :faculty, 'О%')")
     List<Workload> findAllByGroupFaculty(@Param("faculty") String faculty);
+
+    List<Workload> findAllByGroupEqualsAndTypeEquals(StudentsGroup group, Workload.WorkloadType type);
 }
 

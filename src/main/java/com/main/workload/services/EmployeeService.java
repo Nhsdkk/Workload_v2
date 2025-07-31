@@ -11,6 +11,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.lang.module.ResolutionException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -139,5 +140,20 @@ public class EmployeeService {
         var employee = position.get().getEmployee();
         employeePositionRepository.deleteById(positionId);
         return new EmployeeWithPositionsDTO(employee);
+    }
+
+    public List<EmployeePositionDTO> getAllPositionsWithSelectedCompetence(Long lessonId) {
+        var lesson = lessonRepository.findById(lessonId);
+        if (lesson.isEmpty()) {
+            throw new ResourceNotFoundException("Lesson not found");
+        }
+
+        var employees = employeeRepository.findAllByAvailableLessonsContaining(lesson.get());
+        return employees
+                .stream()
+                .map(Employee::getPositions)
+                .flatMap(Collection::stream)
+                .map(EmployeePositionDTO::new)
+                .collect(Collectors.toList());
     }
 }

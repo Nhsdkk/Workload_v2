@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AcademicLoadRepository extends JpaRepository<AcademicLoad, Long> {
@@ -16,7 +17,7 @@ public interface AcademicLoadRepository extends JpaRepository<AcademicLoad, Long
     List<AcademicLoad> findBySubjectAndCourse(String subject, Integer course);
 
     // Найти по названию группы, предмету, курсу и семестру
-    List<AcademicLoad> findByGroupNameAndSubjectAndCourseAndSemester(
+    Optional<AcademicLoad> findByGroupNameAndSubjectAndCourseAndSemester(
             String groupName, String subject, Integer course, Integer semester
     );
 }

@@ -14,4 +14,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     List<Employee> findByPositionsIsEmpty();
     List<Employee> findByPositionsActiveFalse();
+
+    List<Employee> findAllByAvailableLessonsContaining(Lesson availableLessons);
 }

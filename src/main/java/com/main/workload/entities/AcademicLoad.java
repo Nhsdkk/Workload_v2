@@ -64,6 +64,23 @@ public class AcademicLoad {
 
     private Integer total;    // Всего
 
+    public int getEstimatedWorkload(Workload.WorkloadType workloadType) {
+        return switch (workloadType) {
+            case LECTURE -> getLecturesLoad();
+            case PRACTICE -> getPracticalsLoad();
+            case LABORATORY_WORK -> getLabsLoad();
+            case EXAM -> getExam();
+            case RATING -> getRating();
+            case CREDIT -> getCredit();
+            case CONSULT -> getConsult();
+            case KSR -> getKsr();
+            case DIPLOMA -> getDiploma();
+            case OTHER -> getOther();
+            case COURSE_WORK -> getCourseWork();
+            case COURSE_PROJECT -> getCourseProject();
+        };
+    }
+    
     @Override
     public String toString() {
         return "AcademicLoad{" +

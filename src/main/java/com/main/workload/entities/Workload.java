@@ -1,5 +1,6 @@
 package com.main.workload.entities;
 
+import com.main.workload.dtos.CreateWorkloadDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,19 @@ public class Workload {
         this.workload = workload;
         this.group = group;
         this.active = true;
+    }
+
+    public Workload(
+            CreateWorkloadDTO createWorkloadDTO,
+            WorkloadContainer container,
+            StudentsGroup group,
+            AcademicLoad load
+    ) {
+        setActive(createWorkloadDTO.getActive());
+        setType(WorkloadType.valueOf(createWorkloadDTO.getWorkloadType()));
+        setGroup(group);
+        setWorkload(load.getEstimatedWorkload(WorkloadType.valueOf(createWorkloadDTO.getWorkloadType())));
+        container.addWorkload(this);
     }
 
     @Getter

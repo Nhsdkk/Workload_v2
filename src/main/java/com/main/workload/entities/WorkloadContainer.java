@@ -53,4 +53,9 @@ public class WorkloadContainer {
         this.lesson = lesson;
         this.workloads = new ArrayList<>();
     }
+
+    public void setTeacher(EmployeePosition position) {
+        setPosition(position);
+        position.getWorkloadContainers().add(this);
+    }
 }

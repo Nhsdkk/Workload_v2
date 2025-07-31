@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,4 +26,6 @@ public interface StudentsGroupRepository extends JpaRepository<StudentsGroup, Lo
     void upsertByName(@Param("group") StudentsGroup group);
 
     Optional<StudentsGroup> findByName(String name);
+
+    List<StudentsGroup> findAllByNameIn(Collection<String> names);
 }

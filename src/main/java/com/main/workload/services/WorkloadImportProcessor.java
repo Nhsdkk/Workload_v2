@@ -2,8 +2,6 @@ package com.main.workload.services;
 
 import com.main.workload.entities.*;
 import com.main.workload.repositories.*;
-import com.main.workload.utils.Pair;
-import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -12,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.lang.foreign.GroupLayout;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,39 +21,47 @@ public class WorkloadImportProcessor {
     private final LessonRepository lessonRepository;
     private final WorkloadContainerRepository workloadContainerRepository;
     private final WorkloadRepository workloadRepository;
+    private final AcademicLoadRepository academicLoadRepository;
 
     @Autowired
-    public WorkloadImportProcessor(StudentsGroupRepository studentsGroupRepository,
-                                   WorkloadParserService workloadParserService,
-                                   LessonRepository lessonRepository, WorkloadContainerRepository workloadContainerRepository, WorkloadRepository workloadRepository) {
+    public WorkloadImportProcessor(
+            StudentsGroupRepository studentsGroupRepository,
+            WorkloadParserService workloadParserService,
+            LessonRepository lessonRepository,
+            WorkloadContainerRepository workloadContainerRepository,
+            WorkloadRepository workloadRepository,
+            AcademicLoadRepository academicLoadRepository
+    ) {
         this.studentsGroupRepository = studentsGroupRepository;
         this.workloadParserService = workloadParserService;
         this.lessonRepository = lessonRepository;
         this.workloadContainerRepository = workloadContainerRepository;
         this.workloadRepository = workloadRepository;
+        this.academicLoadRepository = academicLoadRepository;
     }
 
     public void process(@NonNull InputStream inputStream) {
 
         List<AcademicLoad> academicLoads = workloadParserService.parse(inputStream);
+        academicLoadRepository.saveAll(academicLoads);
 
-        log.info(String.valueOf(academicLoads == null ? 0 : academicLoads.stream()
-            .filter(Objects::nonNull)
-            .mapToInt(x ->
-                (x.getPracticalsLoad() != null ? x.getPracticalsLoad() : 0) +
-                (x.getLabsLoad() != null ? x.getLabsLoad() : 0) +
-                (x.getLecturesPlan() != null ? x.getLecturesPlan() : 0) +
-                (x.getCourseProject() != null ? x.getCourseProject() : 0) +
-                (x.getCourseWork() != null ? x.getCourseWork() : 0) +
-                (x.getCredit() != null ? x.getCredit() : 0) +
-                (x.getRating() != null ? x.getRating() : 0) +
-                (x.getExam() != null ? x.getExam() : 0) +
-                (x.getKsr() != null ? x.getKsr() : 0) +
-                (x.getOther() != null ? x.getOther() : 0) +
-                (x.getConsult() != null ? x.getConsult() : 0) +
-                (x.getDiploma() != null ? x.getDiploma() : 0)
-            )
-            .sum()
+        log.info(String.valueOf(academicLoads.stream()
+                .filter(Objects::nonNull)
+                .mapToInt(x ->
+                        (x.getPracticalsLoad() != null ? x.getPracticalsLoad() : 0) +
+                                (x.getLabsLoad() != null ? x.getLabsLoad() : 0) +
+                                (x.getLecturesPlan() != null ? x.getLecturesPlan() : 0) +
+                                (x.getCourseProject() != null ? x.getCourseProject() : 0) +
+                                (x.getCourseWork() != null ? x.getCourseWork() : 0) +
+                                (x.getCredit() != null ? x.getCredit() : 0) +
+                                (x.getRating() != null ? x.getRating() : 0) +
+                                (x.getExam() != null ? x.getExam() : 0) +
+                                (x.getKsr() != null ? x.getKsr() : 0) +
+                                (x.getOther() != null ? x.getOther() : 0) +
+                                (x.getConsult() != null ? x.getConsult() : 0) +
+                                (x.getDiploma() != null ? x.getDiploma() : 0)
+                )
+                .sum()
         ));
         Map<String, StudentsGroup> studentsGroups = new HashMap<>();
 
@@ -83,7 +88,7 @@ public class WorkloadImportProcessor {
 
         return savedLesson.get();
     }
-    
+
     private StudentsGroup checkGroup(String name, Integer students, Map<String, StudentsGroup> groups) {
         if (groups.containsKey(name))
             return groups.get(name);
@@ -95,12 +100,13 @@ public class WorkloadImportProcessor {
         if (!group.get().getStudentsCount().equals(students)) {
             group.get().setStudentsCount(students);
             group = Optional.of(studentsGroupRepository.save(group.get()));
-        
+
         }
-        
+
         groups.put(group.get().getName(), group.get());
         return group.get();
     }
+
     private List<WorkloadContainer> makeWorkloadsFromAcademicLoad(List<AcademicLoad> groupedAcademicLoads, Map<String, StudentsGroup> groupMap) {
         Lesson lesson = checkLesson(groupedAcademicLoads.getFirst().getSubject(), groupedAcademicLoads.getFirst().getSemester());
 
@@ -109,7 +115,7 @@ public class WorkloadImportProcessor {
 
         for (var academicLoad : groupedAcademicLoads) {
             StudentsGroup group = checkGroup(academicLoad.getGroupName(), academicLoad.getStudents(), groupMap);
-            
+
             if (academicLoad.getLecturesPlan() != null) {
                 var exist = getExistContainer(lesson, academicLoad, group, academicLoad.getLecturesPlan(), Workload.WorkloadType.LECTURE);
                 if (exist.isPresent() && lectureContainer.getId() == null) {
@@ -161,34 +167,34 @@ public class WorkloadImportProcessor {
             // Отдельная нагрузка
             List<Workload> tmpWorkloadList = new ArrayList<>();
             if (academicLoad.getLabsLoad() != null) {
-                processWorkload(lesson, academicLoad,group,academicLoad.getLabsLoad(), Workload.WorkloadType.LABORATORY_WORK)
+                processWorkload(lesson, academicLoad, group, academicLoad.getLabsLoad(), Workload.WorkloadType.LABORATORY_WORK)
                         .ifPresent(tmpWorkloadList::add);
             }
             if (academicLoad.getPracticalsLoad() != null) {
-                processWorkload(lesson, academicLoad,group, academicLoad.getPracticalsLoad(), Workload.WorkloadType.PRACTICE)
+                processWorkload(lesson, academicLoad, group, academicLoad.getPracticalsLoad(), Workload.WorkloadType.PRACTICE)
                         .ifPresent(tmpWorkloadList::add);
             }
             if (academicLoad.getCourseWork() != null) {
-                processWorkload(lesson, academicLoad,group, academicLoad.getCourseWork(), Workload.WorkloadType.COURSE_WORK)
+                processWorkload(lesson, academicLoad, group, academicLoad.getCourseWork(), Workload.WorkloadType.COURSE_WORK)
                         .ifPresent(tmpWorkloadList::add);
             }
             if (academicLoad.getCourseProject() != null) {
-                processWorkload(lesson, academicLoad,group, academicLoad.getCourseProject(), Workload.WorkloadType.COURSE_PROJECT)
+                processWorkload(lesson, academicLoad, group, academicLoad.getCourseProject(), Workload.WorkloadType.COURSE_PROJECT)
                         .ifPresent(tmpWorkloadList::add);
 
             }
 
             // TODO: Ручное распределение
             if (academicLoad.getDiploma() != null) {
-                processWorkload(lesson, academicLoad,group, academicLoad.getDiploma(), Workload.WorkloadType.DIPLOMA)
+                processWorkload(lesson, academicLoad, group, academicLoad.getDiploma(), Workload.WorkloadType.DIPLOMA)
                         .ifPresent(tmpWorkloadList::add);
             }
             if (academicLoad.getOther() != null) {
-                processWorkload(lesson, academicLoad,group, academicLoad.getOther(), Workload.WorkloadType.OTHER)
+                processWorkload(lesson, academicLoad, group, academicLoad.getOther(), Workload.WorkloadType.OTHER)
                         .ifPresent(tmpWorkloadList::add);
             }
             if (academicLoad.getKsr() != null) {
-                processWorkload(lesson, academicLoad,group, academicLoad.getKsr(), Workload.WorkloadType.KSR)
+                processWorkload(lesson, academicLoad, group, academicLoad.getKsr(), Workload.WorkloadType.KSR)
                         .ifPresent(tmpWorkloadList::add);
             }
 
@@ -208,7 +214,7 @@ public class WorkloadImportProcessor {
     private Optional<Workload> processWorkload(Lesson lesson, AcademicLoad academicLoad, StudentsGroup group, Integer workload, Workload.WorkloadType type) {
         var existWorkload = workloadRepository.findByLessonAndWorkloadAndTypeAndGroup(lesson, workload,
                 type, group);
-        if(existWorkload.size() > 1) {
+        if (existWorkload.size() > 1) {
             log.error("Ошибка при попытке поиска Workload составной ключ не уникален.\n" +
                     "Workloads: {}, AcadecmicLoad: {}", existWorkload.stream().map(Workload::toString), academicLoad);
             throw new RuntimeException("Ошибка при попытке поиска Workload составной ключ не уникален.");

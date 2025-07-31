@@ -48,6 +48,10 @@ public class Lesson {
         name = (updateLessonDTO.getName() != null) ? updateLessonDTO.getName() : name;
     }
 
+    public int getCourse() {
+        return semester / 2;
+    }
+
     @PreRemove
     private void removeLinks() {
         for (var employee : qualifiedEmployees) {

@@ -41,5 +41,10 @@ public class EmployeePositionController {
     public EmployeeWithPositionsDTO deleteEmployeePosition(@PathVariable Long employeeId, @PathVariable Long positionId) {
         return employeeService.deletePosition(employeeId, positionId);
     }
+
+    @GetMapping("/by_competences")
+    public List<EmployeePositionDTO> getAllPositionsWithSelectedCompetence(@RequestParam Long lessonId) {
+        return employeeService.getAllPositionsWithSelectedCompetence(lessonId);
+    }
 }
 
