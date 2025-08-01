@@ -77,27 +77,26 @@ public class EmployeeService {
         }
 
         position.get().Update(updateEmployeePositionDTO);
-        if (updateEmployeePositionDTO.getCompetences() != null) {
-            var lessons = lessonRepository.findAllById(updateEmployeePositionDTO.getCompetences());
-            if (lessons.size() != updateEmployeePositionDTO.getCompetences().size()) {
-                throw new ResourceNotFoundException("Some lessons not found");
-            }
-            position.get().getEmployee().setAvailableLessons(lessons);
-            employeeRepository.save(position.get().getEmployee());
-        }
         employeePositionRepository.save(position.get());
         return new EmployeePositionDetailDTO(position.get().getEmployee(), position.get());
     }
 
     public EmployeeWithPositionsDTO updateEmployee(UpdateEmployeeDTO updateEmployeeDTO) {
-        var result = employeeRepository.findById(updateEmployeeDTO.getId());
-        if (result.isEmpty()) {
+        var employee = employeeRepository.findById(updateEmployeeDTO.getId());
+        if (employee.isEmpty()) {
             throw new ResolutionException("Employee not found");
         }
 
-        result.get().Update(updateEmployeeDTO);
-        employeeRepository.save(result.get());
-        return new EmployeeWithPositionsDTO(result.get());
+        employee.get().Update(updateEmployeeDTO);
+        if (updateEmployeeDTO.getLessons() != null) {
+            var lessons = lessonRepository.findAllById(updateEmployeeDTO.getLessons());
+            if (lessons.size() != updateEmployeeDTO.getLessons().size()) {
+                throw new ResourceNotFoundException("Some lessons not found");
+            }
+            employee.get().setAvailableLessons(lessons);
+        }
+        employeeRepository.save(employee.get());
+        return new EmployeeWithPositionsDTO(employee.get());
     }
 
     public EmployeeWithPositionsDTO createPosition(Long employeeId, CreateEmployeePositionDTO employeePositionDTO) {

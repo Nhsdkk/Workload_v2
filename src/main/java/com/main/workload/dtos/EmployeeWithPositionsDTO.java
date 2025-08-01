@@ -12,12 +12,14 @@ public class EmployeeWithPositionsDTO {
     private String name;
     private String typeOfEmployment;
     private List<PositionDTO> positions;
+    private List<LessonDTO> lessons;
 
     public EmployeeWithPositionsDTO(Employee employee, List<EmployeePosition> positions) {
         this.id = employee.getId();
         this.name = employee.getName();
         this.typeOfEmployment = employee.getTypeOfEmployment();
         this.positions = positions.stream().map(PositionDTO::new).toList();
+        this.lessons = employee.getAvailableLessons().stream().map(LessonDTO::new).toList();
     }
 
     public EmployeeWithPositionsDTO(Employee employee) {
