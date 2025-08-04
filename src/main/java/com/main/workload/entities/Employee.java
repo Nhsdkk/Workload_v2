@@ -49,8 +49,6 @@ public class Employee {
 
     public Employee(CreateEmployeeDTO dto) {
         this(dto.getName(), dto.getTypeOfEmployment());
-        var position = new EmployeePosition(dto.getPosition());
-        addPosition(position);
     }
 
     public void addPosition(@NonNull EmployeePosition position) {
