@@ -1,6 +1,5 @@
 package com.main.workload.entities;
 
-import com.main.workload.dtos.CreateWorkloadDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +22,7 @@ public class Workload {
     @Column(nullable = false)
     private int workload;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "container_id")
     private WorkloadContainer container;
 
@@ -41,15 +40,16 @@ public class Workload {
     }
 
     public Workload(
-            CreateWorkloadDTO createWorkloadDTO,
+            boolean isActive,
+            WorkloadType workloadType,
             WorkloadContainer container,
             StudentsGroup group,
             AcademicLoad load
     ) {
-        setActive(createWorkloadDTO.getActive());
-        setType(WorkloadType.valueOf(createWorkloadDTO.getWorkloadType()));
+        setActive(isActive);
+        setType(workloadType);
         setGroup(group);
-        setWorkload(load.getEstimatedWorkload(WorkloadType.valueOf(createWorkloadDTO.getWorkloadType())));
+        setWorkload(load.getEstimatedWorkload(workloadType));
         container.addWorkload(this);
     }
 

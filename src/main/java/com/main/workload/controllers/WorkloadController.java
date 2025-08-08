@@ -49,7 +49,7 @@ public class WorkloadController {
     }
 
     @PostMapping
-    public WorkloadExportDTO createWorkload(@RequestBody CreateWorkloadDTO createWorkloadDTO) {
+    public List<WorkloadExportDTO> createWorkload(@RequestBody CreateWorkloadDTO createWorkloadDTO) {
         return workloadService.createWorkload(createWorkloadDTO);
     }
 

@@ -28,10 +28,7 @@ public class ExportService {
 
     public List<WorkloadExportDTO> getWorkloads() {
         var containers = workloadContainerRepository.findAllWithAssociations();
-        return containers
-                .stream()
-                .map(WorkloadExportDTO::new)
-                .collect(Collectors.toList());
+        return WorkloadService.aggregateContainers(containers);
     }
 
     public byte[] export() throws IOException {

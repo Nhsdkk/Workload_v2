@@ -5,6 +5,7 @@ import com.main.workload.entities.Workload;
 import com.main.workload.entities.WorkloadContainer;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -12,7 +13,9 @@ import java.util.stream.Collectors;
 
 @Data
 public class WorkloadExportDTO {
+    private List<Long> id;
     private String lessonName;
+    private String lessonSemester;
     private List<String> workloadTypes;
     private Integer workloadHours;
     private String teacherName;
@@ -21,6 +24,7 @@ public class WorkloadExportDTO {
     public WorkloadExportDTO(WorkloadContainer wc) {
         // Наименование дисциплины
         String lessonName = wc.getLesson() != null ? wc.getLesson().getName() : "N/A";
+        String lessonSemester = wc.getLesson() != null ? wc.getLesson().getSemester().toString() : "N/A";
 
         // Уникальные типы нагрузки
         Set<String> workloadTypes = wc.getWorkloads().stream()
@@ -45,7 +49,15 @@ public class WorkloadExportDTO {
         setWorkloadHours(hours);
         setTeacherName(teacher);
         setGroups(groups);
+        setLessonSemester(lessonSemester);
         setWorkloadTypes(workloadTypes.stream().toList());
+        setId(List.of(wc.getId()));
+    }
+
+    public WorkloadExportDTO() {
+        this.id = new ArrayList<>();
+        this.workloadTypes = new ArrayList<>();
+        this.groups = new ArrayList<>();
     }
 
     @Data
