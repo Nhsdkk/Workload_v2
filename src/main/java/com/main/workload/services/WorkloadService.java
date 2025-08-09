@@ -162,24 +162,23 @@ public class WorkloadService {
         var workloadTypes = containerFirst.get().getWorkloads().stream().map(Workload::getType).toList();
 
         if (updateWorkloadDTO.getStudentGroupId() != null && !updateWorkloadDTO.getStudentGroupId().isEmpty()) {
-            List<Long> newGroups = new ArrayList<>();
-            for (var contId : contIds) {
+            Set<Long> newGroups = new java.util.HashSet<>();
+            for (var contId : new ArrayList<>(contIds)) {
                 var container = workloadContainerRepository.findById(contId);
                 if (container.isEmpty()) {
                     throw new ResourceNotFoundException("Container not found");
                 }
                 var workloads = container.get().getWorkloads();
-                for (var workload : workloads) {
+                for (var workload : new ArrayList<>(workloads)) {
                     var groupId = workload.getGroup().getId();
                     if (!updateWorkloadDTO.getStudentGroupId().contains(groupId)) {
+                        container.get().getWorkloads().remove(workload);
                         workloadRepository.delete(workload);
                     } else {
                         newGroups.add(groupId);
                     }
                 }
-                // Подтягиваем изменения
-                container = workloadContainerRepository.findById(contId);
-                if (container.isPresent() && container.get().getWorkloads().isEmpty() && contIds.size() != 1) {
+                if (container.get().getWorkloads().isEmpty() && contIds.size() != 1) {
                     contIds.remove(contId);
                     workloadContainerRepository.delete(container.get());
                 } else container.ifPresent(conts::add);
@@ -193,12 +192,13 @@ public class WorkloadService {
                     if (studentGroup.isEmpty()) {
                         throw new ResourceNotFoundException("Student group not found");
                     }
+                    var lesson = containerFirst.get().getLesson();
 
                     var hoursAmount = academicLoadRepository.findByGroupNameAndSubjectAndCourseAndSemester(
                             studentGroup.get().getName(),
-                            containerFirst.get().getLesson().getName(),
-                            containerFirst.get().getLesson().getCourse(),
-                            containerFirst.get().getLesson().getSemester()
+                            lesson.getName(),
+                            lesson.getCourse(),
+                            lesson.getSemester()
                     );
                     if (hoursAmount.isEmpty()) {
                         throw new ResourceNotFoundException("Workload not found");
