@@ -4,7 +4,6 @@ import com.main.workload.dtos.CreateWorkloadDTO;
 import com.main.workload.dtos.UpdateWorkloadDTO;
 import com.main.workload.dtos.WorkloadExportDTO;
 import com.main.workload.entities.*;
-import com.main.workload.exceptions.InvalidValueException;
 import com.main.workload.exceptions.ResourceNotFoundException;
 import com.main.workload.exceptions.ServerException;
 import com.main.workload.repositories.*;
@@ -50,7 +49,7 @@ public class WorkloadService {
         return potentialWorkloads
                 .stream()
                 .map(Workload::getContainer)
-                .anyMatch(it -> Objects.equals(it.getLesson().getId(), lesson.getId()));
+                .anyMatch(it -> Objects.equals(it.getLesson().getId(), lesson.getId()) && it.getWorkloads().stream().anyMatch(Workload::getActive));
     }
 
     public static List<WorkloadExportDTO> aggregateContainers(List<WorkloadContainer> workloadContainers) {
@@ -116,7 +115,7 @@ public class WorkloadService {
                 }
 
                 if (sameWorkloadExists(Workload.WorkloadType.fromDisplayName(createWorkloadDTO.getWorkloadType().get(i)), lesson.get(), group.get())) {
-                    throw new InvalidValueException("Workload already exists");
+                    throw new ServerException("Workload already exists");
                 }
 
                 if (createWorkloadDTO.getPositionId() != null) {
@@ -142,13 +141,20 @@ public class WorkloadService {
         return containers.stream().distinct().map(WorkloadExportDTO::new).collect(Collectors.toList());
     }
 
-    public void deleteWorkload(Long workloadId) {
-        var workload = workloadRepository.findById(workloadId);
-        if (workload.isEmpty()) {
+    public void deleteWorkload(List<Long> workloadContsId) {
+        var workloadConts = workloadContainerRepository.findAllById(workloadContsId);
+        if (workloadConts.isEmpty()) {
             throw new ResourceNotFoundException("Workload not found");
         }
 
-        workloadRepository.delete(workload.get());
+        for (var cont : workloadConts) {
+            cont.getWorkloads().forEach(workload ->
+            {
+                workload.setActive(false);
+                workloadRepository.save(workload);
+            });
+        }
+        workloadContainerRepository.deleteAll(workloadConts);
     }
 
     public WorkloadExportDTO updateWorkload(UpdateWorkloadDTO updateWorkloadDTO) {
@@ -217,10 +223,17 @@ public class WorkloadService {
 
         var isNullLesson = updateWorkloadDTO.getLessonId() == null;
         var isNullPosition = updateWorkloadDTO.getEmployeePositionId() == null;
+        var isNullActive = updateWorkloadDTO.getActive() == null;
         for (var containerId : contIds) {
             var container = workloadContainerRepository.findById(containerId);
             if (container.isEmpty()) {
                 throw new ResourceNotFoundException("Container not found");
+            }
+            if (!isNullActive) {
+                var workloads = container.get().getWorkloads();
+                for (var workload : new ArrayList<>(workloads)) {
+                    workload.setActive(updateWorkloadDTO.getActive());
+                }
             }
             if (!isNullLesson) {
                 var lesson = lessonRepository.findById(updateWorkloadDTO.getLessonId());

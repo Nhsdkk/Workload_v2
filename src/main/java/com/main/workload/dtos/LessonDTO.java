@@ -11,7 +11,7 @@ public class LessonDTO {
 
     public LessonDTO(Lesson lesson) {
         id = lesson.getId();
-        name = lesson.getName();
+        name = lesson.getName() + " (" + lesson.getSemester().toString() + " семестр)";
         semester = lesson.getSemester();
     }
 }

@@ -10,7 +10,7 @@ public class CreateWorkloadDTO {
     private List<String> workloadType;
     private Boolean active;
     private List<Long> studentGroupId;
-    private Long LessonId;
+    private Long lessonId;
     @Nullable
-    private Long PositionId;
+    private Long positionId;
 }

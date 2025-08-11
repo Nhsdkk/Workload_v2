@@ -1,5 +1,6 @@
 package com.main.workload.entities;
 
+import com.main.workload.exceptions.ServerException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,10 +48,17 @@ public class Workload {
             StudentsGroup group,
             AcademicLoad load
     ) {
+        int hours;
+        try {
+            hours = load.getEstimatedWorkload(workloadType);
+        }
+        catch (NullPointerException e) {
+            throw new ServerException("Workload estimated hours could not be found");
+        }
         setActive(isActive);
         setType(workloadType);
         setGroup(group);
-        setWorkload(load.getEstimatedWorkload(workloadType));
+        setWorkload(hours);
         container.addWorkload(this);
     }
 

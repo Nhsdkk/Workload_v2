@@ -46,5 +46,10 @@ public class EmployeePositionController {
     public List<EmployeePositionDTO> getAllPositionsWithSelectedCompetence(@RequestParam Long lessonId) {
         return employeeService.getAllPositionsWithSelectedCompetence(lessonId);
     }
+
+    @GetMapping("/by_lesson")
+    public List<EmployeePositionAnalyticsDTO> getAllPositionsWithSelectedLesson(@RequestParam Long lessonId) {
+        return employeeService.getEmployeesForSwap(lessonId);
+    }
 }
 

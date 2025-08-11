@@ -1,6 +1,7 @@
 package com.main.workload.controllers;
 
 import com.main.workload.dtos.CreateWorkloadDTO;
+import com.main.workload.dtos.SwapWorkloadDTO;
 import com.main.workload.dtos.UpdateWorkloadDTO;
 import com.main.workload.dtos.WorkloadExportDTO;
 import com.main.workload.services.ExportService;
@@ -53,12 +54,24 @@ public class WorkloadController {
         return workloadService.createWorkload(createWorkloadDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteWorkload(@PathVariable Long id) {
+    @PutMapping("/swap")
+    public void swapWorkload(@RequestBody SwapWorkloadDTO swapWorkloadDTO) {
+        workloadService.deleteWorkload(swapWorkloadDTO.getOldContainerIds());
+        var dto = new CreateWorkloadDTO();
+        dto.setWorkloadType(List.of(swapWorkloadDTO.getWorkloadType()));
+        dto.setActive(true);
+        dto.setStudentGroupId(swapWorkloadDTO.getStudentGroupsId());
+        dto.setLessonId(swapWorkloadDTO.getLessonId());
+        dto.setPositionId(swapWorkloadDTO.getNewPositionId());
+        workloadService.createWorkload(dto);
+    }
+
+    @DeleteMapping
+    public void deleteWorkload(List<Long> id) {
         workloadService.deleteWorkload(id);
     }
 
-    @PutMapping
+    @PatchMapping
     public WorkloadExportDTO updateWorkload(@RequestBody UpdateWorkloadDTO updateWorkloadDTO) {
         return workloadService.updateWorkload(updateWorkloadDTO);
     }

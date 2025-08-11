@@ -8,6 +8,7 @@ import com.main.workload.exceptions.ResourceNotFoundException;
 import com.main.workload.repositories.LessonRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ public class LessonService {
                 .findAll()
                 .stream()
                 .map(LessonDTO::new)
+                .sorted(Comparator.comparing(LessonDTO::getName))
                 .collect(Collectors.toList());
     }
 

@@ -10,6 +10,8 @@ public class UpdateWorkloadDTO {
     @Nullable
     private Long lessonId;
     @Nullable
+    private Boolean active;
+    @Nullable
     private Long employeePositionId;
     @Nullable
     private List<Long> studentGroupId;

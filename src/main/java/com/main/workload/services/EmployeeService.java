@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.module.ResolutionException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,7 +45,17 @@ public class EmployeeService {
 
     public List<EmployeePositionDTO> getAllEmployeePositions() {
         List<EmployeePosition> positions = employeePositionRepository.findAll();
-        return positions.stream().map(EmployeePositionDTO::new).collect(Collectors.toList());
+        return positions.stream().sorted(Comparator.comparing(x -> x.getEmployee().getName()))
+                .map(EmployeePositionDTO::new).collect(Collectors.toList());
+    }
+
+    public List<EmployeePositionAnalyticsDTO> getEmployeesForSwap(Long lessonId) {
+        var employeePositions = employeePositionRepository.findAll();
+        return employeePositions
+                .stream().filter(x -> x.getEmployee().getAvailableLessons().stream()
+                .anyMatch(lesson -> Objects.equals(lesson.getId(), lessonId)))
+                .map(EmployeePositionAnalyticsDTO::new)
+                .collect(Collectors.toList());
     }
 
     public EmployeePositionDetailDTO getEmployeePositionDetailById(Long id) {
