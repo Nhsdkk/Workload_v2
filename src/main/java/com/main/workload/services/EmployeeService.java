@@ -55,6 +55,7 @@ public class EmployeeService {
                 .stream().filter(x -> x.getEmployee().getAvailableLessons().stream()
                 .anyMatch(lesson -> Objects.equals(lesson.getId(), lessonId)))
                 .map(EmployeePositionAnalyticsDTO::new)
+                .sorted(Comparator.comparing(EmployeePositionAnalyticsDTO::getTotalHours).reversed())
                 .collect(Collectors.toList());
     }
 
