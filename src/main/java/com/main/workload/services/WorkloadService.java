@@ -115,7 +115,7 @@ public class WorkloadService {
                     throw new ServerException("Can't find load associated to existing student group and lesson");
                 }
 
-                if (sameWorkloadExists(Workload.WorkloadType.valueOf(createWorkloadDTO.getWorkloadType().get(i)), lesson.get(), group.get())) {
+                if (sameWorkloadExists(Workload.WorkloadType.fromDisplayName(createWorkloadDTO.getWorkloadType().get(i)), lesson.get(), group.get())) {
                     throw new InvalidValueException("Workload already exists");
                 }
 
@@ -129,7 +129,7 @@ public class WorkloadService {
 
                 var workload = new Workload(
                         createWorkloadDTO.getActive(),
-                        Workload.WorkloadType.valueOf(createWorkloadDTO.getWorkloadType().get(i)),
+                        Workload.WorkloadType.fromDisplayName(createWorkloadDTO.getWorkloadType().get(i)),
                         containers.get(i),
                         group.get(),
                         associatedLoad.get()

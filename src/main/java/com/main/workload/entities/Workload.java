@@ -3,6 +3,7 @@ package com.main.workload.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
@@ -69,6 +70,15 @@ public class Workload {
         COURSE_PROJECT("Курсовой проект");
 
         private final String translation;
+
+        public static @NonNull WorkloadType fromDisplayName(@NonNull String displayName) throws IllegalArgumentException {
+            for (WorkloadType workload : WorkloadType.values()) {
+                if (workload.getTranslation().equalsIgnoreCase(displayName)) {
+                    return workload;
+                }
+            }
+            throw new IllegalArgumentException("No workload type found for display name: " + displayName);
+        }
 
         WorkloadType(String translation) {
             this.translation = translation;
