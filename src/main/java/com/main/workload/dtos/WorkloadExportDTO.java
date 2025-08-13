@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class WorkloadExportDTO {
     private List<Long> id;
     private String lessonName;
+    private Long lessonId;
     private String lessonSemester;
     private List<String> workloadTypes;
     private Integer workloadHours;
@@ -23,6 +24,7 @@ public class WorkloadExportDTO {
 
     public WorkloadExportDTO(WorkloadContainer wc) {
         // Наименование дисциплины
+        Long lessonId = wc.getLesson() != null ? wc.getLesson().getId() : -1;
         String lessonName = wc.getLesson() != null ? wc.getLesson().getName() : "N/A";
         String lessonSemester = wc.getLesson() != null ? wc.getLesson().getSemester().toString() : "N/A";
 
@@ -49,6 +51,7 @@ public class WorkloadExportDTO {
         setWorkloadHours(hours);
         setTeacherName(teacher);
         setGroups(groups);
+        setLessonId(lessonId);
         setLessonSemester(lessonSemester);
         setWorkloadTypes(workloadTypes.stream().toList());
         setId(List.of(wc.getId()));

@@ -56,9 +56,10 @@ public class WorkloadController {
 
     @PutMapping("/swap")
     public void swapWorkload(@RequestBody SwapWorkloadDTO swapWorkloadDTO) {
+        var workloadTypes = exportService.getWorkloads().stream().filter(x -> swapWorkloadDTO.getOldContainerIds() == x.getId()).findFirst().orElseThrow().getWorkloadTypes();
         workloadService.deleteWorkload(swapWorkloadDTO.getOldContainerIds());
         var dto = new CreateWorkloadDTO();
-        dto.setWorkloadType(List.of(swapWorkloadDTO.getWorkloadType()));
+        dto.setWorkloadType(workloadTypes);
         dto.setActive(true);
         dto.setStudentGroupId(swapWorkloadDTO.getStudentGroupsId());
         dto.setLessonId(swapWorkloadDTO.getLessonId());

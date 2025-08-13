@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-record CustomKey(String lessonName, String lessonSemester, Set<String> types, String teacher) {}
+record CustomKey(Long lessonId, Set<String> types, String teacher) {}
 
 
 @Service
@@ -55,15 +55,16 @@ public class WorkloadService {
     public static List<WorkloadExportDTO> aggregateContainers(List<WorkloadContainer> workloadContainers) {
         return workloadContainers.stream().map(WorkloadExportDTO::new).collect(Collectors.toMap(
                 w -> new CustomKey(
-                        w.getLessonName(),
-                        w.getLessonSemester(),
+                        w.getLessonId(),
                         Set.copyOf(w.getWorkloadTypes()),
                         w.getTeacherName()
                 ),
                 w -> {
                     var d = new WorkloadExportDTO();
                     d.setLessonName(w.getLessonName());
+                    d.setLessonSemester(w.getLessonSemester());
                     d.setTeacherName(w.getTeacherName());
+                    d.setLessonId(w.getLessonId());
                     d.setWorkloadTypes(new ArrayList<>(w.getWorkloadTypes()));
                     d.setId(new ArrayList<>(w.getId()));
                     d.setGroups(new ArrayList<>(w.getGroups()));
