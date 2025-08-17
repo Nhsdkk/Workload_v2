@@ -171,6 +171,7 @@ public class WorkloadService {
                 workload.setActive(false);
                 workloadRepository.save(workload);
                 cont.getWorkloads().remove(workload);
+                workloadContainerRepository.save(cont);
             });
             if (cont.getWorkloads().isEmpty()) {
                 workloadContainerRepository.delete(cont);
