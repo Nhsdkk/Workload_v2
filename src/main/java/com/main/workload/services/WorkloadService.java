@@ -1,6 +1,7 @@
 package com.main.workload.services;
 
 import com.main.workload.dtos.CreateWorkloadDTO;
+import com.main.workload.dtos.SwapWorkloadDTO;
 import com.main.workload.dtos.UpdateWorkloadDTO;
 import com.main.workload.dtos.WorkloadExportDTO;
 import com.main.workload.entities.*;
@@ -156,6 +157,36 @@ public class WorkloadService {
             });
         }
         workloadContainerRepository.deleteAll(workloadConts);
+    }
+
+    public void deleteWorkloadsByGroups(List<Long> workloadContsId, List<Long> groupIds) {
+        var workloadConts = workloadContainerRepository.findAllById(workloadContsId);
+        if (workloadConts.isEmpty()) {
+            throw new ResourceNotFoundException("Workload not found");
+        }
+
+        for (var cont : workloadConts) {
+            cont.getWorkloads().stream().filter(wl -> groupIds.contains(wl.getGroup().getId())).forEach(workload ->
+            {
+                workload.setActive(false);
+                workloadRepository.save(workload);
+                cont.getWorkloads().remove(workload);
+            });
+            if (cont.getWorkloads().isEmpty()) {
+                workloadContainerRepository.delete(cont);
+            }
+        }
+    }
+
+    public void swapWorkload(SwapWorkloadDTO swapWorkloadDTO, List<String> workloadTypes) {
+        deleteWorkloadsByGroups(swapWorkloadDTO.getOldContainerIds(), swapWorkloadDTO.getStudentGroupsId());
+        var dto = new CreateWorkloadDTO();
+        dto.setWorkloadType(workloadTypes);
+        dto.setActive(true);
+        dto.setStudentGroupId(swapWorkloadDTO.getStudentGroupsId());
+        dto.setLessonId(swapWorkloadDTO.getLessonId());
+        dto.setPositionId(swapWorkloadDTO.getNewPositionId());
+        createWorkload(dto);
     }
 
     public WorkloadExportDTO updateWorkload(UpdateWorkloadDTO updateWorkloadDTO) {
