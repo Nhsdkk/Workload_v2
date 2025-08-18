@@ -56,7 +56,7 @@ public class WorkloadController {
 
     @PutMapping("/swap")
     public void swapWorkload(@RequestBody SwapWorkloadDTO swapWorkloadDTO) {
-        var workloadTypes = exportService.getWorkloads().stream().filter(x -> swapWorkloadDTO.getOldContainerIds() == x.getId()).findFirst().orElseThrow().getWorkloadTypes();
+        var workloadTypes = exportService.getWorkloads().stream().filter(x -> swapWorkloadDTO.getOldContainerIds().equals(x.getId())).findFirst().orElseThrow().getWorkloadTypes();
         workloadService.swapWorkload(swapWorkloadDTO, workloadTypes);
     }
 
