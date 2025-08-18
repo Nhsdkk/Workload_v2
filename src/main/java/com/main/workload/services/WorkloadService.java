@@ -93,9 +93,15 @@ public class WorkloadService {
         List<WorkloadContainer> containers = new ArrayList<>();
         if (createWorkloadDTO.getWorkloadType().contains(Workload.WorkloadType.LECTURE.toString())) {
             var container = new WorkloadContainer(lesson.get());
+            workloadContainerRepository.save(container);
             createWorkloadDTO.getWorkloadType().forEach(_ -> containers.add(container));
         } else {
-            createWorkloadDTO.getWorkloadType().forEach(_ -> containers.add(new WorkloadContainer(lesson.get())));
+            createWorkloadDTO.getWorkloadType().forEach(_ ->
+            {
+                var container = new WorkloadContainer(lesson.get());
+                workloadContainerRepository.save(container);
+                containers.add(container);
+            });
         }
 
         for (var i = 0; i < containers.size(); i++) {
@@ -166,13 +172,17 @@ public class WorkloadService {
         }
 
         for (var cont : workloadConts) {
-            cont.getWorkloads().stream().filter(wl -> groupIds.contains(wl.getGroup().getId())).forEach(workload ->
-            {
+            List<Workload> toRemove = cont.getWorkloads().stream()
+                    .filter(wl -> groupIds.contains(wl.getGroup().getId()))
+                    .toList();
+
+            for (Workload workload : toRemove) {
                 workload.setActive(false);
                 workloadRepository.save(workload);
                 cont.getWorkloads().remove(workload);
                 workloadContainerRepository.save(cont);
-            });
+            }
+
             if (cont.getWorkloads().isEmpty()) {
                 workloadContainerRepository.delete(cont);
             }

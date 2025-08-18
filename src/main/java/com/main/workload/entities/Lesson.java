@@ -49,7 +49,7 @@ public class Lesson {
     }
 
     public int getCourse() {
-        return semester / 2;
+        return (semester + 1) / 2;
     }
 
     @PreRemove
