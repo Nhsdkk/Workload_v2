@@ -59,7 +59,7 @@ public class WorkloadController {
         workloadService.swapWorkload(swapWorkloadDTO);
     }
 
-    @PostMapping
+    @PostMapping("/delete")
     public void deleteWorkload(@RequestBody List<Long> id) {
         workloadService.deleteWorkload(id);
     }
