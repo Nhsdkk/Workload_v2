@@ -91,7 +91,7 @@ public class WorkloadService {
         }
 
         List<WorkloadContainer> containers = new ArrayList<>();
-        if (createWorkloadDTO.getWorkloadType().contains(Workload.WorkloadType.LECTURE.toString())) {
+        if (createWorkloadDTO.getWorkloadType().contains(Workload.WorkloadType.LECTURE.getTranslation())) {
             var container = new WorkloadContainer(lesson.get());
             workloadContainerRepository.save(container);
             createWorkloadDTO.getWorkloadType().forEach(_ -> containers.add(container));
@@ -156,48 +156,40 @@ public class WorkloadService {
         }
 
         for (var cont : workloadConts) {
-            cont.getWorkloads().forEach(workload ->
-            {
-                workload.setActive(false);
-                workloadRepository.save(workload);
-            });
+            workloadRepository.deleteAll(cont.getWorkloads());
         }
         workloadContainerRepository.deleteAll(workloadConts);
     }
 
-    public void deleteWorkloadsByGroups(List<Long> workloadContsId, List<Long> groupIds) {
-        var workloadConts = workloadContainerRepository.findAllById(workloadContsId);
+    public void swapWorkload(SwapWorkloadDTO swapWorkloadDTO) {
+        var workloadConts = workloadContainerRepository.findAllById(swapWorkloadDTO.getOldContainerIds());
         if (workloadConts.isEmpty()) {
             throw new ResourceNotFoundException("Workload not found");
         }
 
+        var teacher = employeePositionRepository.findById(swapWorkloadDTO.getNewPositionId()).orElseThrow();
         for (var cont : workloadConts) {
             List<Workload> toRemove = cont.getWorkloads().stream()
-                    .filter(wl -> groupIds.contains(wl.getGroup().getId()))
+                    .filter(wl -> swapWorkloadDTO.getStudentGroupsId().contains(wl.getGroup().getId()))
                     .toList();
 
+
+            var newCont = new WorkloadContainer();
+            if (!toRemove.isEmpty()) {
+                newCont.setLesson(cont.getLesson());
+                newCont.setTeacher(teacher);
+                workloadContainerRepository.save(newCont);
+            }
+
             for (Workload workload : toRemove) {
-                workload.setActive(false);
+                workload.setContainer(newCont);
                 workloadRepository.save(workload);
-                cont.getWorkloads().remove(workload);
-                workloadContainerRepository.save(cont);
             }
 
             if (cont.getWorkloads().isEmpty()) {
                 workloadContainerRepository.delete(cont);
             }
         }
-    }
-
-    public void swapWorkload(SwapWorkloadDTO swapWorkloadDTO, List<String> workloadTypes) {
-        deleteWorkloadsByGroups(swapWorkloadDTO.getOldContainerIds(), swapWorkloadDTO.getStudentGroupsId());
-        var dto = new CreateWorkloadDTO();
-        dto.setWorkloadType(workloadTypes);
-        dto.setActive(true);
-        dto.setStudentGroupId(swapWorkloadDTO.getStudentGroupsId());
-        dto.setLessonId(swapWorkloadDTO.getLessonId());
-        dto.setPositionId(swapWorkloadDTO.getNewPositionId());
-        createWorkload(dto);
     }
 
     public WorkloadExportDTO updateWorkload(UpdateWorkloadDTO updateWorkloadDTO) {

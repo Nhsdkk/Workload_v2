@@ -20,9 +20,7 @@ public class WorkloadContainer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "container", cascade = {
-            CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH
-    }, orphanRemoval = true)
+    @OneToMany(mappedBy = "container", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Workload> workloads;
 
     @ManyToOne

@@ -8,6 +8,5 @@ import java.util.List;
 public class SwapWorkloadDTO {
     private List<Long> oldContainerIds;
     private List<Long> studentGroupsId;
-    private Long lessonId;
     private Long newPositionId;
 }
