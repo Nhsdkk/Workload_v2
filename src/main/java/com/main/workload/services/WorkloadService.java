@@ -81,7 +81,7 @@ public class WorkloadService {
                     );
                     return a;
                 }
-        )).values().stream().toList();
+        )).values().stream().filter(x -> !x.getGroups().isEmpty()).toList();
     }
 
     public List<WorkloadExportDTO> createWorkload(CreateWorkloadDTO createWorkloadDTO) {
@@ -183,6 +183,7 @@ public class WorkloadService {
 
             for (Workload workload : toRemove) {
                 workload.setContainer(newCont);
+                cont.getWorkloads().remove(workload);
                 workloadRepository.save(workload);
             }
 
