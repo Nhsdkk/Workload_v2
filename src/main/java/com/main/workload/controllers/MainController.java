@@ -6,6 +6,7 @@ import com.main.workload.services.distribution.WorkloadAssignmentManagerService;
 import com.main.workload.services.distribution.WorkloadDistributionServiceGenetic;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +25,7 @@ public class MainController {
     private final WorkloadAssignmentManagerService workloadAssignmentManagerService;
 
     @PostMapping("/distribute")
-    public void distributeWorkload() {
+    public ResponseEntity<Void> distributeWorkload() {
         WorkloadAssignmentManagerService.DistributionResult result = workloadAssignmentManagerService.assignWorkload();
         System.out.println(result.getQuality().getSummary());
 
@@ -59,5 +60,7 @@ public class MainController {
             System.out.println("Контейнер ID: " + assignment.getContainer().getId() +
                     ", Назначен: " + assignment.getPosition().getEmployee().getName());
         }
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -6,6 +6,7 @@ import com.main.workload.dtos.UpdateLessonDTO;
 import com.main.workload.services.LessonService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +29,9 @@ public class LessonController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLesson(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
         lessonService.deleteLesson(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping

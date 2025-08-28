@@ -55,13 +55,15 @@ public class WorkloadController {
     }
 
     @PutMapping("/swap")
-    public void swapWorkload(@RequestBody SwapWorkloadDTO swapWorkloadDTO) {
+    public ResponseEntity<Void> swapWorkload(@RequestBody SwapWorkloadDTO swapWorkloadDTO) {
         workloadService.swapWorkload(swapWorkloadDTO);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/delete")
-    public void deleteWorkload(@RequestBody List<Long> id) {
+    public ResponseEntity<Void> deleteWorkload(@RequestBody List<Long> id) {
         workloadService.deleteWorkload(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping
